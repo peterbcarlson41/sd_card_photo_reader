@@ -4,7 +4,10 @@ This script automatically reads files from a specified SD Card and transfers the
 
 ## Prerequisites
 
-This guide is tailored for MacOS Systems.
+- **Operating System**: MacOS System.
+- **Dependencies**: Install ExifTool. Run the following command in Terminal:
+
+  brew install exiftool
 
 ## Setup Instructions
 
@@ -25,6 +28,6 @@ This guide is tailored for MacOS Systems.
 
 - Ensure your script file `detect_sd_card.sh` is executable. Run `chmod +x detect_sd_card.sh` in the Terminal.
 
-### Step 4: Install Dependencies
+---
 
-- Install ExifTool using Homebrew:
+With these setup steps, your SD Card files will be efficiently read and organized with minimal manual intervention.

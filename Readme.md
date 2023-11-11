@@ -1,27 +1,30 @@
-This is a script that automatically reads the files from a specified SD Card to a Specified directory.
+# SD Card File Reader Script
 
-Helpful for quickly sorting photos into a file system.
+This script automatically reads files from a specified SD Card and transfers them to a designated directory. It is particularly useful for quickly organizing photos into a file system.
 
-The following setup instructions apply to a MacOS System:
+## Prerequisites
 
-Setup:
+This guide is tailored for MacOS Systems.
 
-1. Set up your environment variables:
+## Setup Instructions
 
-Create a file named ".env" in the cloned directory
+### Step 1: Set Up Environment Variables
 
-2. Ensure that you give the terminal full disk access:
+- **Create Environment File**: In the cloned directory, create a file named `.env`.
 
-System Preferences: Open System Preferences and go to Security & Privacy.
-Privacy Tab: Click on the Privacy tab.
-Full Disk Access: In the list on the left, scroll down and select Full Disk Access.
-Unlock to Make Changes: Click the lock icon at the bottom left to make changes. You will need to enter your administrator password.
-Add Terminal: Click the + button under the list of applications that have Full Disk Access, navigate to the Utilities folder, and select Terminal (or iTerm if you use it). For scripts running from an IDE or other applications, you need to add those specific applications instead.
-Relaunch Terminal: After adding Terminal to the list, close and reopen it for the changes to take effect.
-Script Permissions:
+### Step 2: Grant Terminal Full Disk Access
 
-Make sure your script file (detect_sd_card.sh) is executable. You can set this permission by running chmod +x detect_sd_card.sh in the Terminal.
+1. **System Preferences**: Open System Preferences and navigate to Security & Privacy.
+2. **Privacy Tab**: Click on the Privacy tab.
+3. **Full Disk Access**: Scroll down in the list on the left and select Full Disk Access.
+4. **Unlock for Changes**: Click the lock icon at the bottom left to enable changes. Enter your administrator password.
+5. **Add Terminal**: Click the + button under the list of applications with Full Disk Access. Navigate to the Utilities folder and select Terminal (or iTerm, if used). For scripts running from an IDE or other applications, add those applications here.
+6. **Relaunch Terminal**: Close and reopen the Terminal for the changes to take effect.
 
-3. Install necessary dependencies:
+### Step 3: Script Permissions
 
-brew install exiftool
+- Ensure your script file `detect_sd_card.sh` is executable. Run `chmod +x detect_sd_card.sh` in the Terminal.
+
+### Step 4: Install Dependencies
+
+- Install ExifTool using Homebrew:

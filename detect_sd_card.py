@@ -6,6 +6,9 @@ from pathlib import Path
 import subprocess
 from PIL import Image
 from PIL.ExifTags import TAGS
+import threading
+import queue
+import re
 
 # Load .env file
 def load_dotenv(dotenv_path='.env'):
@@ -54,12 +57,40 @@ def should_copy_file(file):
     allowed_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff'}
     return file.suffix.lower() in allowed_extensions
 
+# Function to prompt the user for a directory name with a timeout
+def prompt_directory_name(default, timeout=10):
+    print(f"Enter a name for the new directory (default '{default}' in {timeout}s): ", end='', flush=True)
+
+    q = queue.Queue()
+
+    def user_input():
+        try:
+            name = input()
+            if not name.strip():
+                q.put(default)
+            elif re.match(r'^[a-zA-Z0-9_\- ]+$', name):
+                q.put(f"{default}_{name}")
+            else:
+                print("Invalid directory name. Using default.")
+                q.put(default)
+        except:
+            q.put(default)
+
+    t = threading.Thread(target=user_input)
+    t.daemon = True
+    t.start()
+
+    try:
+        return q.get(block=True, timeout=timeout)
+    except queue.Empty:
+        print("No input received. Using default.")
+        return default
+
 # Copy files from SD subdirectory
 def copy_files_from_sd_subdirectory():
     sd_card_path = f'/Volumes/{SDCARD_NAME}'
     found_subdirectory = None
 
-    # Find the target subdirectory
     for subdir in Path(sd_card_path).rglob(PHOTO_SUBDIRECTORY):
         found_subdirectory = subdir
         break
@@ -69,12 +100,10 @@ def copy_files_from_sd_subdirectory():
         latest_timestamp = '19700101000000'
         most_recent_file_timestamp = latest_timestamp
 
-        # Read the last processed timestamp
         if Path(LAST_PROCESSED_FILE).is_file():
             with open(LAST_PROCESSED_FILE, 'r') as f:
                 latest_timestamp = f.read().strip()
 
-        # Collect all eligible files
         eligible_files = []
         for file in found_subdirectory.glob('*'):
             if file.is_file() and should_copy_file(file):
@@ -89,24 +118,37 @@ def copy_files_from_sd_subdirectory():
                     if file_timestamp > most_recent_file_timestamp:
                         most_recent_file_timestamp = file_timestamp
 
-        # Process collected files
+        date_directory_names = {}
+
         for file, file_timestamp in eligible_files:
             year = file_timestamp[:4]
             month_num = file_timestamp[4:6]
             month = datetime.datetime.strptime(month_num, "%m").strftime("%B")
+            day = file_timestamp[6:8]
 
             target_directory = Path(TARGET_DIR, year, month)
-            target_directory.mkdir(parents=True, exist_ok=True)
+            date_key = f"{year}-{month_num}-{day}"
 
-            shutil.copy2(file, target_directory)
+            if date_key not in date_directory_names:
+                # Prompt for directory name
+                day_directory_name = prompt_directory_name(date_key)
+                date_directory_names[date_key] = day_directory_name
+            else:
+                # Use the existing named directory for this date
+                day_directory_name = date_directory_names[date_key]
+
+            day_directory = target_directory / day_directory_name
+            day_directory.mkdir(parents=True, exist_ok=True)
+
+            shutil.copy2(file, day_directory)
             new_files_found = True
 
-        # Update the last processed date
+
         if new_files_found and most_recent_file_timestamp != latest_timestamp:
             with open(LAST_PROCESSED_FILE, 'w') as f:
                 f.write(most_recent_file_timestamp)
 
-            print(f"Files copied to {target_directory}.")
+            print(f"Files copied to {day_directory}.")
         else:
             print("No new files to copy.")
     else:

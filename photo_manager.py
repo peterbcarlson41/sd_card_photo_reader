@@ -127,7 +127,7 @@ def copy_files_from_sd_subdirectory():
             day = file_timestamp[6:8]
 
             target_directory = Path(TARGET_DIR, year, month)
-            date_key = f"{year}-{month_num}-{day}"
+            date_key = f"{month_num}-{day}-{year}"
 
             if date_key not in date_directory_names:
                 # Prompt for directory name
@@ -154,12 +154,5 @@ def copy_files_from_sd_subdirectory():
     else:
         print(f"Subdirectory named {PHOTO_SUBDIRECTORY} not found in {sd_card_path}.")
 
-# Main loop
-while True:
-    if check_sd_card():
-        print(f"SD Card {SDCARD_NAME} detected.")
-        copy_files_from_sd_subdirectory()
-        
-        while check_sd_card():
-            time.sleep(5)
-    time.sleep(5)
+if __name__ == "__main__":
+    copy_files_from_sd_subdirectory()
